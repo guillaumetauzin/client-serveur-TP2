@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>client 1</title>
+</head>
+
+<body>
+    <p>client 1</p>
+
+    <div>
+        <label for="msg">Votre message : </label>
+        <input id="msg" type="text" name="msg">
+    </div>
+    <div>
+        <input id="test" type="submit" value="Envoyer">
+    </div>
+    <br>
+    <div>
+        <label for="received">Messages reçus : </label>
+    </div>
+    <div>
+        <textarea id="received" type="range" name="received" rows="10" cols="50"></textarea>
+    </div>
+
+    <script>
+        (function() {
+            window.onload = function() {
+                const socket = new WebSocket('ws://localhost:3000');
+
+                // Connection opened
+                socket.addEventListener('open', function(event) {
+                    socket.send('Hello Server! Client - 1');
+                });
+
+                // Listen for messages
+                socket.addEventListener('message', function(event) {
+                    console.log('Message from server ', event.data);
+                    document.getElementById('received').value += `${JSON.stringify(event.data)}\n`;
+                });
+
+                const btn = document.getElementById('test');
+                btn.addEventListener('click', async() => {
+                    try {
+                        socket.send(JSON.stringify(document.getElementById('msg').value));
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+            };
+        })();
+    </script>
+</body>
+
+</html>
